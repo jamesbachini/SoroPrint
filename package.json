@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "install": "^0.13.0",
+    "npm": "^11.4.2",
+    "printer": "^0.4.0",
+    "stellar-sdk": "^13.3.0"
+  }
+}
