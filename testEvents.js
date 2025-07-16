@@ -68,4 +68,4 @@ setInterval(() => {
     runCheckEvents().catch(error => {
         console.error('Interval error:', error);
     });
-}, 5000);
+}, 15000);
