@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SoroPrint – Send It!</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/13.1.0/stellar-sdk.min.js"></script>
+<style>
+:root{
+ --bg1:#ff9a9e;--bg2:#fad0c4;--glass:rgba(255,255,255,.25);--txt:#222;--accent:#ff5858;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ height:100vh;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ background:linear-gradient(130deg,var(--bg1),var(--bg2));
+ font-family:"Poppins",sans-serif;
+ color:var(--txt);
+}
+#panel{
+ backdrop-filter:blur(10px);
+ background:var(--glass);
+ border-radius:20px;
+ padding:40px 50px;
+ box-shadow:0 20px 40px rgba(0,0,0,.2);
+ text-align:center;
+ width:90%;
+ max-width:420px;
+}
+h1{font-size:2.2rem;margin-bottom:1.2rem;color:var(--accent)}
+input{
+ width:100%;
+ padding:15px 18px;
+ border:none;
+ border-radius:30px;
+ font-size:1rem;
+ outline:none;
+ margin-bottom:20px;
+}
+button{
+ background:var(--accent);
+ color:#fff;
+ border:none;
+ border-radius:30px;
+ padding:14px 34px;
+ font-size:1rem;
+ cursor:pointer;
+ transition:.25s transform;
+}
+button:hover{transform:scale(1.05)}
+#msg{margin-top:18px;font-weight:600;height:22px}
+small{display:block;margin-top:28px;font-size:.75rem;color:#444}
+</style>
+</head>
+<body>
+<div id="panel">
+  <h1>🖨️ SoroPrint</h1>
+  <input id="text" maxlength="32" placeholder="type your masterpiece…" autocomplete="off">
+  <button id="send">PRINT</button>
+  <div id="msg"></div>
+  <small id="addr"></small>
+</div>
+
+<script>
+const contractId='CDEKWHMZNDI3MWKMZ55HFVPVYXVCBRICDKUJROWWHOQQ4YKLR5NL5WOU';
+const rpcUrl='https://soroban-testnet.stellar.org';
+const networkPassphrase=StellarSdk.Networks.TESTNET;
+const RpcServer=StellarSdk.SorobanRpc?StellarSdk.SorobanRpc.Server:StellarSdk.rpc.Server;
+const rpc=new RpcServer(rpcUrl);
+const contract=new StellarSdk.Contract(contractId);
+const msgEl=document.getElementById('msg');
+let keypair;
+
+(async()=>{
+ keypair=await createFundedAccount();
+ document.getElementById('addr').textContent=`wallet: ${keypair.publicKey().slice(0,6)}…${keypair.publicKey().slice(-5)}`;
+ document.getElementById('send').onclick=async()=>{
+   const raw=document.getElementById('text').value.trim();
+   if(!raw){flash('enter something first');return}
+   try{
+     await sendToPrinter(raw);
+     flash('Sent to printer ✅');
+     document.getElementById('text').value='';
+   }catch(e){console.error(e);flash('oops – failed ❌')}
+ };
+})();
+
+function flash(txt){msgEl.textContent=txt;setTimeout(()=>msgEl.textContent='',3000)}
+
+async function createFundedAccount(){
+ const kp=StellarSdk.Keypair.random();
+ await fetch(`https://friendbot.stellar.org/?addr=${kp.publicKey()}`);
+ await new Promise(r=>setTimeout(r,8e3));
+ return kp;
+}
+
+async function sendToPrinter(text){
+ const sanitized=text.split(' ').join('_').replace(/[^a-zA-Z0-9_]/g,'').slice(0,32);
+ const account=await rpc.getAccount(keypair.publicKey());
+ let tx=new StellarSdk.TransactionBuilder(account,{fee:StellarSdk.BASE_FEE,networkPassphrase})
+  .addOperation(contract.call('print',StellarSdk.nativeToScVal(sanitized,{type:'symbol'})))
+  .setTimeout(30).build();
+ tx=await rpc.prepareTransaction(tx);
+ tx.sign(keypair);
+ await rpc.sendTransaction(tx);
+}
+</script>
+</body>
+</html>
