@@ -2,13 +2,14 @@
 
 An experiment to connect a physical office printer to the Stellar blockchain using Soroban smart contracts, event listeners, and command-line printing.
 
-[https://github.com/jamesbachini/SoroPrint](https://github.com/jamesbachini/SoroPrint)
+Live Demo: [https://jamesbachini.github.io/SoroPrint/](https://jamesbachini.github.io/SoroPrint/)
 
 **Key components:**
 
 1. A Soroban smart contract emitting `print` events.
 2. A local Node.js monitor that listens to the Stellar RPC network.
 3. A cross-platform print script using system tools.
+4. A little index.html dApp hosted on Github pages
 
 ---
 
