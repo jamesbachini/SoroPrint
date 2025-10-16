@@ -5,7 +5,7 @@ const path = require('path');
 const StellarSdk = require('stellar-sdk');
 const rpc = new StellarSdk.rpc.Server('https://soroban-testnet.stellar.org');
 
-const contractId = 'CDEKWHMZNDI3MWKMZ55HFVPVYXVCBRICDKUJROWWHOQQ4YKLR5NL5WOU';
+const contractId = 'CBLKHZ3DGA7UDKC7KO7AJBF4MJSCWMZ3APUDNTU47CG5TWZCEHLGV4IK';
 const eventsProcessed = [];
 
 const print = (message) => {
